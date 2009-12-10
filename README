@@ -1,0 +1,58 @@
+PaginatingSelect
+================
+
+Use this plugin if your select has a lot of options.
+The UI is a text field with a button that opens a partial
+of a paginated set of radio buttons.
+
+Requirements:
+mislav-will-paginate gem
+desert gem
+
+To use:
+1. Install the plugin.
+2. Require 'desert' in your config/environment.rb
+3. Include the following lines in your stylesheets and javascripts
+  - paginating_select.sass
+  - paginating_select.js
+4. Replace your text_field() with text_field_with_paginating_select()
+   ---
+    text_field_with_paginating_select(object, method, tag_options = {}, partial_options = {}, remote_options = {})
+    *see lib/paginating_select_helper.rb for complete parameters
+   ---
+5. Prepare the partial for the options. In the partial, put this function:
+   ---
+    paginating_select_result(collection, field, options= {}, paginating_options= {}, remote_options={})
+    *see lib/paginating_select_helper.rb for complete parameters
+   ---
+6. In your controller, include this:
+   ---
+     if request.xml_http_request?
+      render :partial => 'your_partial', :layout => false
+     end
+   ---
+   This is needed because only the partial will be updated when 
+   changing page.
+   You may use multiple paginating partials in one page. Change the parameters
+   as necessary, see mislav-will-paginate
+7. If you want to include remote_functions, provide the necessary options for
+   the remote_options parameter. You will however be the one to create the
+   corresponding action. params[:return] will contain the value of the selected
+   option.
+
+Example
+=======
+For the text field:
+ = text_field_with_paginating_select :position_rep, :person_reported, {}, 
+    {:view => 'manager_list', :object => @managers}, 
+    {:url => {:controller => 'positions', :action => 'available_position', :from => 'auto'}, :partial => 'position_div', :loading => "Element.show('loading-auto');", :loaded => "Element.hide('loading-auto');"}
+
+For the options:
+= paginating_select_result(@managers, 'position_with_employee', 
+{:empty_text => I18n.t(:no_record), :object => 'position_rep', :method => 'person_reported'}, 
+{:param_name => :manager_page, :page => params[:manager_page]}, 
+{:url => {:controller => 'positions', :action => 'available_position', :from => 'auto', :member_page => params[:member_page]}, :partial => 'position_div', :loading => "Element.show('loading-auto');", :loaded => "Element.hide('loading-auto');"}
+)
+
+
+Copyright (c) 2009 [name of plugin creator], released under the MIT license

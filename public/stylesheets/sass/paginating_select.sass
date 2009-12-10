@@ -1,0 +1,52 @@
+.paginating_select 
+  input
+    :float left
+    :width 226px
+  select
+    :width 235px
+  textarea
+    :float left
+    :width  272px
+    :height 45px
+.tip-div 
+  :background #FFFFFF
+  :z-index 1000
+  :position absolute 
+  :font-style normal
+  :color #666666
+  :font-size 1em
+  :line-height 1.4
+
+
+/* for ie */
+.tip-div
+  :position absolute
+  :z-index 10
+  :overflow hidden
+  :width 290px
+
+  iframe
+    :display none
+    :display/**/ block
+    :position absolute
+    :top 0
+    :left 0
+    :z-index -1
+    :filter mask()
+    :width 3000px
+    :height 3000px
+
+  .bd
+    :border solid 1px #aaaaaa
+    :padding 12px
+  
+  input
+    :width 15px
+    :height 15px
+
+.tip-border 
+  :padding 10px
+  :overflow hidden
+  :border 1px solid #bbbaba
+  :height 1% /* IE fix */
+
