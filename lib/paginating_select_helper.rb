@@ -11,9 +11,6 @@ module PaginatingSelectHelper
   # :partial - id of the div to update
   # :loading - while js is loading
   # :loaded - after js has loaded
-  #
-  # Example:
-  #
   def text_field_with_paginating_select(object, method, tag_options = {}, partial_options = {}, remote_options = {})
     @object = object
     @method = method
@@ -61,6 +58,7 @@ module PaginatingSelectHelper
   # :params - additional params you want to pass
   # and the following params from will_paginate
   # :inner_window, :outer_window and :renderer
+  # TODO: maybe :page could be removed
   # 
   # If you want to have an event observer, include the following options
   # For remote_options:
@@ -71,15 +69,12 @@ module PaginatingSelectHelper
   # Output
   # It outputs params[:return] which is the display value of the chosen radio
   # button
-  # Example:
-  #
   def paginating_select_result(collection, field, options= {}, paginating_options= {}, remote_options={})
     if collection.empty?
       h options[:empty_text] || "No Records Found"
     else
       @object ||= options[:object]
       @method ||= options[:method]
-
       radios = collection.map {|col| tag(:input, :type => "radio", :name => @method, :value => "#{col[field.to_sym].nil? ? col.method(field).call : col[field.to_sym]}", :onclick => "$('#{@object}_#{@method}').value = this.value;#{remote_options.empty? ? '' : remote_function(:url => remote_options[:url].merge(:return => (col[field.to_sym].nil? ? col.method(field).call : col[field.to_sym])), :loading => "Element.hide('"+ remote_options[:partial] + "');" + remote_options[:loading], :loaded => "Element.show('"+ remote_options[:partial] + "');" + remote_options[:loaded])}") + (col[field.to_sym].nil? ? col.method(field).call : col[field.to_sym]) + tag("br")}
 
       content_tag("div", :style => "float:right;") do
@@ -87,8 +82,12 @@ module PaginatingSelectHelper
       end +
 
       content_tag("div", radios) +
-      add_radio_button_setter(@object, @method) + 
-      add_pagination(collection, paginating_options, "#{@method}_options")
+      if (collection.count < collection.per_page) && (paginating_options[:page] != collection.per_page.to_s)
+        add_radio_button_setter(@object, @method) 
+      else
+        add_radio_button_setter(@object, @method) + 
+        add_pagination(collection, paginating_options, "#{@method}_options") 
+      end
     end
   end
 
