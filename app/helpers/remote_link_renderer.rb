@@ -1,5 +1,3 @@
-# app/helpers/remote_link_renderer.rb
-
 class RemoteLinkRenderer < WillPaginate::LinkRenderer
   def prepare(collection, options, template)
     @remote = options.delete(:remote) || {}

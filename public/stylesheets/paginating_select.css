@@ -23,7 +23,7 @@
   position: absolute;
   z-index:  10;
   overflow:  hidden;
-  width:  290px;
+  width:  300px;
 }
 .tip-div iframe{
     display: none;
@@ -48,4 +48,58 @@
   overflow: hidden;
   border: 1px solid #bbbaba;
   height: 1%; /* IE fix */
+}
+
+.pagination {
+  padding: 3px;
+  margin: 3px;
+  text-align: left;
+  font-size: 11px; }
+  .pagination a {
+    padding: 2px 5px 2px 5px;
+    margin-right: 2px;
+    border: 1px solid #6E6E6E;
+    text-decoration: none;
+    color: #848484;
+    background-color: #A9D0F5;
+    font-weight: bold;
+    display: inline-block; }
+    .pagination a:hover, div.pagination a:active {
+      border: 1px solid #81BEF7;
+      color: #848484;
+      background-color: #FFFFFF; }
+  .pagination span.current {
+    padding: 2px 5px 2px 5px;
+    margin-right: 2px;
+    border: 1px solid #BDBDBD;
+    font-weight: bold;
+    color: #848484; }
+  .pagination span.disabled {
+    padding: 2px 5px 2px 5px;
+    margin-right: 2px;
+    border: 1px solid #BDBDBD;
+    color: #848484; }
+
+.ps-search-field{
+  color: #888888;
+  height: 30px;
+}
+
+.ps-search-field input{
+  width: 150px;
+  border: 2px solid #9B9B9B;
+}
+.ps-search-field span{
+  float: left;
+  font-weight: bold;
+  margin-top: 2px;
+  padding-right: 10px;
+}
+.ps-search-field a{
+  float: left;
+  padding-right: 3px;
+}
+.ps-search-field img{
+  height: 14px;
+  margin-top: 4px;
 }

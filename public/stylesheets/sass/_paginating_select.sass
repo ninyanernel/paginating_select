@@ -1,0 +1,109 @@
+.paginating_select 
+  input
+    :float left
+    :width 226px
+  select
+    :width 235px
+  textarea
+    :float left
+    :width  272px
+    :height 45px
+.tip-div 
+  :background #FFFFFF
+  :z-index 1000
+  :position absolute 
+  :font-style normal
+  :color #666666
+  :font-size 1em
+  :line-height 1.4
+
+
+/* for ie */
+.tip-div
+  :position absolute
+  :z-index 10
+  :overflow hidden
+  :width 300px
+
+  iframe
+    :display none
+    :display/**/ block
+    :position absolute
+    :top 0
+    :left 0
+    :z-index -1
+    :filter mask()
+    :width 3000px
+    :height 3000px
+
+  .bd
+    :border solid 1px #aaaaaa
+    :padding 12px
+  
+  input
+    :width 15px
+    :height 15px
+
+.tip-border 
+  :padding 10px
+  :overflow hidden
+  :border 1px solid #bbbaba
+  :height 1% /* IE fix */
+
+div.pagination
+  :padding 3px
+  :margin 3px
+  :text-align left
+  :font-size 11px
+
+  a
+    :padding 2px 5px 2px 5px
+    :margin-right 2px
+    :border 1px solid #6E6E6E
+    :text-decoration none
+    :color #848484
+    :background-color #A9D0F5
+    :font-weight bold
+    :display inline-block
+
+    &:hover, &:active
+      :border 1px solid #81BEF7
+      :color #848484
+      :background-color #FFFFFF
+
+  span
+    &.current
+      :padding 2px 5px 2px 5px
+      :margin-right 2px
+      :border 1px solid #BDBDBD
+      :font-weight bold
+      :color #848484
+
+    &.disabled
+      :padding 2px 5px 2px 5px
+      :margin-right 2px
+      :border 1px solid #BDBDBD
+      :color #848484
+
+.ps-search-field
+  :color #888888
+  :height 30px
+
+  input
+    :width 150px
+    :border 2px solid #9B9B9B
+
+  span
+    :float left
+    :font-weight bold
+    :margin-top 2px
+    :padding-right 10px
+
+  a
+    :float left
+    :padding-right 3px
+
+  img
+    :height 14px
+    :margin-top 4px
+

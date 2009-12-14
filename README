@@ -1,5 +1,5 @@
 PaginatingSelect
-================
+----------------
 
 Use this plugin if your select has a lot of options.
 The UI is a text field with a button that opens a partial
@@ -10,32 +10,30 @@ mislav-will-paginate gem
 desert gem
 
 Notes:
-- Explain when virtual attribute is needed
-- Explain method parameter in text_field_with_paginating_select
-- Explain the field parameter in paginating_select_result
+- You may want to consider a custom method/virtual attribute for the method parameter 
+  in text_field_with_paginating_select and paginating_select_result
+  for better readability
 
 To use:
 1. Install the plugin.
 2. Require 'desert' in your config/environment.rb
 3. Perform the following task:
    ---
-    > rake paginating_select:export_js_css
-
-    or if you're using sass:
-    > rake paginating_select:export_js_sass
+    > rake paginating_select:export use='sass' 
+    or use='css'
    ---
 4. Include the following lines in your stylesheets and javascripts
-  - paginating_select.css
+  - paginating_select.css for 'css' stylesheet
   - paginating_select.js
 5. Replace your text_field() with text_field_with_paginating_select()
    ---
     text_field_with_paginating_select(object, method, tag_options = {}, partial_options = {}, remote_options = {})
-    *see lib/paginating_select_helper.rb for complete parameters
+    *see plugin's app/helpers/paginating_select_helper.rb for complete parameters
    ---
 6. Prepare the partial for the options. In the partial, put this function:
    ---
-    paginating_select_result(collection, field, options= {}, paginating_options= {}, remote_options={})
-    *see lib/paginating_select_helper.rb for complete parameters
+    paginating_select_result(collection, field, options= {}, paginating_options= {}, remote_options={}, search_options= {})
+    *see plugin's app/helpers/paginating_select_helper.rb for complete parameters
    ---
 7. In your controller, include this:
    ---
@@ -53,18 +51,19 @@ To use:
    option.
 
 Example
-=======
-For the text field:
+-------
+For the text field with remote and pagination options: 
  = text_field_with_paginating_select :employee, :employee_no, {}, 
     {:view => 'employee_list', :object => @employees}, 
     {:url => {:controller => 'employees', :action => 'available_employees', :additional_param => 'additional param value'}, :partial => 'div_to_update', :loading => "Element.show('loading-auto');", :loaded => "Element.hide('loading-auto');"}
 
-For the options in the partial:
+For the options list in the partial(with remote and pagination options):
 *at _employee_list.html.haml:
 = paginating_select_result(@employees, 'employee_no_with_name', 
 {:empty_text => "No Employees Found!", :object => 'employee', :method => 'employee_no'}, 
 {:param_name => :emp_page, :page => params[:emp_page]}, 
-{:url => {:controller => 'employees', :action => 'available_employees', :additional_param => 'additional param value', :emp_page => params[:emp_page]}, :partial => 'div_to_update', :loading => "Element.show('loading-auto');", :loaded => "Element.hide('loading-auto');"}
+{:url => {:controller => 'employees', :action => 'available_employees', :additional_param => 'additional param value', :emp_page => params[:emp_page]}, :partial => 'div_to_update', :loading => "Element.show('loading-auto');", :loaded => "Element.hide('loading-auto');"},
+{:url => {:action => 'search'}, :params => {:emp_page => params[:emp_page]}}
 )
 
 
