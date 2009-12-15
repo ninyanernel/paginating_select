@@ -19,21 +19,22 @@ To use:
 2. Require 'desert' in your config/environment.rb
 3. Perform the following task:
    ---
-    > rake paginating_select:export use='sass' 
-    or use='css'
+    > rake paginating_select:export use='sass' file='my_file.sass' 
+    or rake paginating_select:export use='css'
    ---
 4. Include the following lines in your stylesheets and javascripts
   - paginating_select.css for 'css' stylesheet
   - paginating_select.js
 5. Replace your text_field() with text_field_with_paginating_select()
+   or replace your text_area() with text_area_with_paginating_select()
    ---
     text_field_with_paginating_select(object, method, tag_options = {}, partial_options = {}, remote_options = {})
-    *see plugin's app/helpers/paginating_select_helper.rb for complete parameters
+    *see plugin's app/helpers/paginating_select_helper.rb for complete description of parameters
    ---
 6. Prepare the partial for the options. In the partial, put this function:
    ---
     paginating_select_result(collection, field, options= {}, paginating_options= {}, remote_options={}, search_options= {})
-    *see plugin's app/helpers/paginating_select_helper.rb for complete parameters
+    *see plugin's app/helpers/paginating_select_helper.rb for complete description of parameters
    ---
 7. In your controller, include this:
    ---
@@ -41,23 +42,30 @@ To use:
       render :partial => 'your_partial', :layout => false
      end
    ---
-   This is needed because only the partial will be updated when 
-   changing page.
+   This is needed because only the partial will be updated when changing page.
    You may use multiple paginating partials in one page. Change the parameters
-   as necessary, see mislav-will-paginate documentation
+   as necessary, see mislav-will-paginate documentation.
 8. If you want to include remote_functions, provide the necessary options for
    the remote_options parameter. You will however be the one to create the
    corresponding action. params[:return] will contain the value of the selected
    option.
+9. If you want to include the search functionality, provide the necessary 
+   parameters for search_options. You will however provide the action for 
+   search. params[:your_method_search] will be the value of the search text. 
 
 Example
 -------
 For the text field with remote and pagination options: 
  = text_field_with_paginating_select :employee, :employee_no, {}, 
     {:view => 'employee_list', :object => @employees}, 
-    {:url => {:controller => 'employees', :action => 'available_employees', :additional_param => 'additional param value'}, :partial => 'div_to_update', :loading => "Element.show('loading-auto');", :loaded => "Element.hide('loading-auto');"}
+    {:url => {:controller => 'employees', :action => 'available_employees', :additional_param => 'additional param value'}, 
+    {:partial => 'div_to_update', :loading => "Element.show('loading-auto');", :loaded => "Element.hide('loading-auto');"}
+ / _employee_list.html.haml is the partial with the paginating_select helper
+ / @employees is the WillPaginate::Collection object, see example below
+ / you may add any additional parameter in the :url option
+ / for the remote_options, 'loading-auto' is the id of the div that shows the spinner gif
 
-For the options list in the partial(with remote and pagination options):
+For the options list in the partial(with remote, search and pagination options):
 *at _employee_list.html.haml:
 = paginating_select_result(@employees, 'employee_no_with_name', 
 {:empty_text => "No Employees Found!", :object => 'employee', :method => 'employee_no'}, 
@@ -66,5 +74,28 @@ For the options list in the partial(with remote and pagination options):
 {:url => {:action => 'search'}, :params => {:emp_page => params[:emp_page]}}
 )
 
+Sample controller code:
+  def new
+    # I needed to use this for the conditional statement I have below.
+    params[:job_page] = params[:job_page] ? (params[:job_page].blank? ? 1 : params[:job_page]) : nil
+    params[:parent_page] = params[:parent_page] ? (params[:parent_page].blank? ? 1 : params[:parent_page]) : nil
+    
+    @position = Position.new
+    @position_rep = PositionReportingStructure.new
+
+    # WillPaginate::Collections
+    # replace code LIKE OR title LIKE with your own search condition/s
+    @jobs = PositionType.paginate(:conditions => ['thru_date is ? AND (code LIKE ? OR title LIKE ? )', nil, "%#{params[:position_type_name_search]}%",  "%#{params[:position_type_name_search]}%"], :order => 'code', :page => params[:job_page], :per_page => 5)
+    @parents = Position.paginate(:conditions => ['actual_thru_date is NULL AND (code LIKE ? OR person_names.name LIKE ?)', "%#{params[:person_reported_search]}%", "%#{params[:person_reported_search]}%"], :include => {:current_position_fulfillment => {:person => :person_names}}, :order => 'code', :page => params[:parent_page], :per_page => 5)
+
+    if request.xml_http_request?
+      # Conditional statement used because I had two partials with pagination.
+      if params[:job_page]
+        render :partial => 'job_list', :layout => false
+      else
+        render :partial => 'parent_list', :layout => false
+      end
+    end
+  end
 
 Copyright (c) 2009 [name of plugin creator], released under the MIT license

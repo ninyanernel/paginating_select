@@ -39,6 +39,34 @@ module PaginatingSelectHelper
     end
   end
 
+  def text_area_with_paginating_select(object, method, tag_options = {}, partial_options = {}, remote_options = {})
+    @object = object
+    @method = method
+    page = "document.onload=setBd();"
+    page << "function setBd(){"
+    page << "$('bd').style.position = 'static';"
+    page << "}"
+    
+    content_tag("div", :class => 'paginating_select') do
+      text_area(object, method, tag_options) +
+      link_to_function(image_tag('paginating_select/arrowbullet.gif', :id => "#{method}_img", :class => 'tip-img'), "display_options('#{method}_div', '#{method}_img');setRadioButtons('#{method}_options', '#{object}_#{method}');") +
+      content_tag("div", :id => "#{method}_div", :class => "tip-div", :style => "display:none;") do
+        content_tag("div", :class => "tip-border") do
+          content_tag("div", :id => "#{method}_options") do
+            render :partial => partial_options[:view], @object => partial_options[:object] 
+          end
+        end
+      end +
+      
+      unless remote_options.empty?
+        javascript_tag(page) +
+        observe_field("#{object}_#{method}", :url => remote_options[:url], :with => 'return', :loading => "Element.hide('"+ remote_options[:partial] + "');" + remote_options[:loading], :loaded => "Element.show('"+ remote_options[:partial] + "');" + remote_options[:loaded])  
+      else
+        javascript_tag(page)
+      end
+    end
+  end
+
   # Put this in the partial
   # Arguments:
   # collection - collection from controller, must be a WillPaginate::Collection
@@ -50,10 +78,12 @@ module PaginatingSelectHelper
   #               default will be "No Records Found"
   # :object - Pass the object if you'll be using pagination
   # :method - Pass the method if you'll be using pagination
+  # :multiple - Set to 'true' if you want check boxes, set to 'false' if you
+  #             want radio buttons
   # * object and method should be same as the one used in text_field
   # For paginating_options:
   # The required gem for pagination is mislav_will_paginate
-  # :param_name - name of the page param, default is :page
+  # :param_name - name of the page param, default is :page, must be unique
   # :page - params[:page]
   # :params - additional params you want to pass
   # and the following params from will_paginate
@@ -62,7 +92,7 @@ module PaginatingSelectHelper
   # If you want to have an event observer, include the following options
   # For remote_options:
   # :url - controller/action, include params
-  # :partial - partial to update
+  # :partial - div id to update
   # :loading - while js is loading
   # :loaded - after js has loaded
   # For search_options:
@@ -121,18 +151,24 @@ module PaginatingSelectHelper
 
   def add_radio_buttons(object, method, collection, field, options ={}, paginating_options={}, remote_options= {}, search_options= {})
     field_name = search_options[:field_name] || "#{method}_search" unless search_options.empty?
-    radios = collection.map {|col| tag(:input, :type => "radio", :name => method, :value => "#{col[field.to_sym].nil? ? col.method(field).call : col[field.to_sym]}", :onclick => "$('#{object}_#{method}').value = this.value;#{remote_options.empty? ? '' : remote_function(:url => remote_options[:url].merge(:return => (col[field.to_sym].nil? ? col.method(field).call : col[field.to_sym])), :loading => "Element.hide('"+ remote_options[:partial] + "');" + remote_options[:loading], :loaded => "Element.show('"+ remote_options[:partial] + "');" + remote_options[:loaded])}") + (col[field.to_sym].nil? ? col.method(field).call : col[field.to_sym]) + tag("br")}
-      content_tag("div", radios) +
-      if collection.total_pages == 1
-        add_radio_button_setter(object, method) 
-      else
-        add_radio_button_setter(object, method) + 
-        add_pagination(collection, paginating_options, "#{method}_options", search_options.empty? ? {} : {field_name.to_sym => params[field_name.to_sym]}.merge(search_options[:params])) 
-      end
+    type = options[:multiple].eql?('true') ? "checkbox" : "radio"
+    event = type.eql?('radio') ? "$('#{object}_#{method}').value = this.value" : "updateTextMultiple('#{method}_options', '#{object}_#{method}')"
+    radios = collection.map {|col| tag(:input, :type => type, :name => method, :value => "#{col[field.to_sym].nil? ? col.method(field).call : col[field.to_sym]}", :onclick => "#{event};#{remote_options.empty? ? '' : remote_function(:url => remote_options[:url].merge(:return => (col[field.to_sym].nil? ? col.method(field).call : col[field.to_sym])), :loading => "Element.hide('"+ remote_options[:partial] + "');" + remote_options[:loading], :loaded => "Element.show('"+ remote_options[:partial] + "');" + remote_options[:loaded])}") + (col[field.to_sym].nil? ? col.method(field).call : col[field.to_sym]) + tag("br")}
+    content_tag("div", radios) +
+    if collection.total_pages == 1
+      add_button_setter(object, method, type) 
+    else
+      add_button_setter(object, method, type) + 
+      add_pagination(collection, paginating_options, "#{method}_options", search_options.empty? ? {} : {field_name.to_sym => params[field_name.to_sym]}.merge(search_options[:params])) 
+    end
   end
 
-  def add_radio_button_setter(object, method)
-      function = "setRadioButtons("
+  def add_button_setter(object, method, type)
+      if type.eql?("radio")
+        function = "setRadioButtons("
+      else
+        function = "setCheckboxes("
+      end
       function << "'#{method}_options', "
       function << "'#{object}_#{method}'"
       function << ");"
