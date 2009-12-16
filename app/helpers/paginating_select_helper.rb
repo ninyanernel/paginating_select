@@ -98,6 +98,7 @@ module PaginatingSelectHelper
   # For search_options:
   # :field_name - id of the text_field, defaults to #{method}_search
   # :url - url for the search action
+  # :method - request method
   # :params - additional params needed
   #
   # Output
@@ -134,11 +135,11 @@ module PaginatingSelectHelper
       js_params = ["'#{field_name}=' + $F('#{field_name}')", param].join 
       content_tag("div", :class => "ps-search-field") do
         text_field_tag(field_name) +
-        link_to_remote(image_tag('paginating_select/search.gif'), :url => options[:url], :with => js_params, :update => "#{method}_options", :loading => "$('#{method}-ps-search-load').show();", :loaded => "$('#{method}-ps-search-load').hide();") + 
+        link_to_remote(image_tag('paginating_select/search.gif'), :url => options[:url], :method => options[:method], :with => js_params, :update => "#{method}_options", :loading => "Element.show('#{method}-ps-search-load');", :loaded => "Element.hide('#{method}-ps-search-load');") + 
         
         # Reload
         content_tag("div", :id => "#{method}-ps-reload") do
-          link_to_remote(image_tag('paginating_select/reload.gif'), :url => options[:url], :with => ["'#{field_name}=' + ''", param].join, :update => "#{method}_options", :loading => "$('#{method}-ps-search-load').show();", :loaded => "$('#{method}-ps-search-load').hide();")  
+          link_to_remote(image_tag('paginating_select/reload.gif'), :url => options[:url], :method => options[:method], :with => ["'#{field_name}=' + ''", param].join, :update => "#{method}_options", :loading => "Element.show('#{method}-ps-search-load');", :loaded => "Element.hide('#{method}-ps-search-load');")  
         end +
 
         # Loader
