@@ -2,6 +2,15 @@ String.prototype.trim = function() {
   return this.replace(/^\s+|\s+$/g,"");
 }
 
+String.prototype.to_hex = function() {
+  ret = "";
+  for (var i=0; i<this.length; i++)
+  {
+    ret = ret.concat('%' + this.charCodeAt(i).toString(16)); 
+  }
+  return ret;
+}
+
 /* Used for displayOptions() */
 function findPos(obj){
   var curleft = 0;

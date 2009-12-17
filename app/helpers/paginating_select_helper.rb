@@ -132,7 +132,7 @@ module PaginatingSelectHelper
       field_name = options[:field_name] || "#{method}_search"
       options[:params].merge!(page_param)
       param = options[:params].map {|key, value| " + '&#{key}=#{value}'"}.join
-      js_params = ["'#{field_name}=' + $F('#{field_name}')", param].join 
+      js_params = ["'#{field_name}=' + $F('#{field_name}').to_hex()", param].join
       content_tag("div", :class => "ps-search-field") do
         text_field_tag(field_name) +
         link_to_remote(image_tag('paginating_select/search.gif'), :url => options[:url], :method => options[:method], :with => js_params, :update => "#{method}_options", :loading => "Element.show('#{method}-ps-search-load');", :loaded => "Element.hide('#{method}-ps-search-load');") + 
